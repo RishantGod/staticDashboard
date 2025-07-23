@@ -1,0 +1,113 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100vh;
+  background-color: #F1F3F5;
+}
+
+body{
+  padding: 2rem 0 0 0;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+.dashboard {
+  width: 95%;
+  height: 95%;
+  margin: 0 auto;
+  background-color: #F1F3F5;
+}
+
+.top-row {
+  width:100%;
+  height:40%;
+  background-color: #F1F3F5;
+  display:flex;
+  justify-content: space-between;
+}
+
+.bottom-row {
+  width:100%;
+  height:60%;
+  background-color: #F1F3F5;
+  display: flex;
+  justify-content: space-between;
+}
+
+.total-ban {
+  width:calc(20% - 1rem);
+  height:calc(100% - 1rem);
+  background-color: white;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.donut-chart {
+  width: calc(30% - 1rem);
+  height: calc(100% - 1rem);
+  background-color: white;
+  border-radius: 20px;
+}
+
+.heatmap {
+  width: calc(50% - 1rem);
+  height: calc(100% - 1rem);
+  background-color: white;
+  border-radius: 20px;
+}
+
+.ban-group {
+  width: calc(20% - 1rem);
+  height: calc(100% - 1rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.map {
+  width: calc(80% - 1rem);
+  height: calc(100% - 1rem);
+  background-color: white;
+  border-radius: 20px;
+}
+
+.ban {
+  width: 100%;
+  height: calc((100% / 3) - 1rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  background-color: white;
+}
+
+
+
+/* * ---- Typography ---- * */
+
+.total-ban-value {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #333;
+  
+}
+
+.ban-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
