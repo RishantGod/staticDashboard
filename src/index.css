@@ -39,7 +39,8 @@ body{
   height:60%;
   background-color: #F1F3F5;
   display: flex;
-  justify-content: space-between;
+  justify-content: start;
+  gap: 2rem;
 }
 
 .total-ban {
@@ -77,10 +78,21 @@ body{
 }
 
 .map {
-  width: calc(80% - 1rem);
+  width: calc(30% - 1rem);
   height: calc(100% - 1rem);
   background-color: white;
   border-radius: 20px;
+}
+
+.bar-chart {
+  width: calc(50% - 1rem);
+  height: calc(100% - 1rem);
+  background-color: white;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .ban {

@@ -1,10 +1,20 @@
 import React from 'react'
 import BAN from './BAN.jsx'
 import TotalBAN from './TotalBAN.jsx'
-import MAP from './MAP.jsx' 
 import LineChart from './LineChart.jsx'
 import DonutChart from './DonutChart.jsx'
 import Heatmap from './Heatmap.jsx'
+import Map from './Map.jsx'
+import BarChart from './BarChart.jsx'
+
+
+
+
+
+
+
+
+
 
 export default function Dashboard() {
   return (
@@ -20,7 +30,8 @@ export default function Dashboard() {
                 <BAN heading="Fuel" value="2000" />
                 <BAN heading="Heating & Cooling" value="3000" />
             </div>
-            <MAP />
+             <Map />
+             <BarChart />
         </div>
     </div>
   )
