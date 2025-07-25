@@ -1,4 +1,7 @@
 import Data from './data.json';
+import { BsFillLightningChargeFill } from "react-icons/bs";
+import { MdOilBarrel } from "react-icons/md";
+import { MdAir } from "react-icons/md";
 
 // Function to aggregate totals for donut chart
 export const getDonutChartData = () => {
@@ -31,17 +34,20 @@ export const getDonutChartData = () => {
     {
       name: 'Electricity',
       value: Math.round(totalElectricity * 10) / 10,
-      color: '#FF6B6B'
+      color: '#FF2F7E',
+      icon: <BsFillLightningChargeFill style={{ color: '#FF2F7E', fillOpacity: 1, fontSize: '1.5em' }} />
     },
     {
       name: 'Heating & Cooling',
       value: Math.round(totalHeatingCooling * 10) / 10,
-      color: '#4ECDC4'
+      color: '#FF6B45',
+      icon: <MdAir style={{ color: '#FF6B45', fillOpacity: 1 ,fontSize: '1.5em' }} />
     },
     {
       name: 'Fuel',
       value: Math.round(totalFuel * 10) / 10,
-      color: '#45B7D1'
+      color: '#6050DC',
+      icon: <MdOilBarrel style={{ color: '#6050DC',fillOpacity: 1 ,fontSize: '1.5em' }} />
     }
   ];
 };

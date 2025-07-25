@@ -6,28 +6,36 @@ export default function DonutChart() {
     const data = getDonutChartData();
     
     // Chart dimensions
-    const width = 300;
-    const height = 300;
-    const margin = 40;
+    const width = 350;
+    const height = 320; // Reduced height to make room for legend
+    const margin = 20; // Reduced margin
     const radius = Math.min(width, height) / 2 - margin;
     const innerRadius = radius * 0.6; // Creates the donut hole
     
     // D3 calculations
     const { arcs, colorScale, total } = useMemo(() => {
-        // Create pie generator
+        // Create pie generator with padding for gaps
         const pieGenerator = pie()
             .value(d => d.value)
-            .sort(null); // Maintain original order
+            .sort(null) // Maintain original order
+            .padAngle(0.03); // Add small gaps between arcs
         
         // Create arc generator
         const arcGenerator = arc()
             .innerRadius(innerRadius)
-            .outerRadius(radius);
+            .outerRadius(radius)
+            .cornerRadius(4); // Optional: rounded corners
+            
+        // Create arc generator for icon positioning (middle of the arc)
+        const iconArcGenerator = arc()
+            .innerRadius((innerRadius + radius) / 2)
+            .outerRadius((innerRadius + radius) / 2);
         
         // Generate arcs data
         const arcsData = pieGenerator(data).map(d => ({
             ...d,
-            path: arcGenerator(d)
+            path: arcGenerator(d),
+            iconPosition: iconArcGenerator.centroid(d)
         }));
         
         // Create color scale
@@ -47,19 +55,30 @@ export default function DonutChart() {
     
     return (
         <div className="donut-chart">
-            <h3>Carbon Emissions by Category</h3>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px' }}>
+            <h3 style={{ margin: '14px 0 10px 30px', fontSize: '20px', textAlign: 'left' }}>
+                Carbon Emissions by Category
+            </h3>
+            <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                gap: '1px',
+                height: '100%',
+                overflow: 'visible'
+            }}>
                 {/* SVG Chart */}
-                <svg width={width} height={height}>
-                    <g transform={`translate(${width/2}, ${height/2})`}>
+                <svg width={width} height={height} style={{ marginBottom: '10px' }}>
+                    <g transform={`translate(${width/2}, ${height/2 - 20})`}>
                         {arcs.map((arc, index) => (
                             <g key={arc.data.name}>
                                 {/* Arc path */}
                                 <path
                                     d={arc.path}
                                     fill={arc.data.color}
-                                    stroke="white"
-                                    strokeWidth={2}
+                                    fillOpacity={0.5}
+                                    stroke={arc.data.color}
+                                    strokeWidth={1}
                                     style={{
                                         cursor: 'pointer',
                                         transition: 'opacity 0.3s ease'
@@ -84,66 +103,30 @@ export default function DonutChart() {
                                 >
                                     {((arc.data.value / total) * 100).toFixed(1)}%
                                 </text>
+                                
+                                {/* Icons */}
+                                <foreignObject
+                                    x={arc.iconPosition[0] - 12}
+                                    y={arc.iconPosition[1] - 12}
+                                    width="24"
+                                    height="24"
+                                    style={{ pointerEvents: 'none' }}
+                                >
+                                    <div style={{ 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center',
+                                        width: '100%',
+                                        height: '100%'
+                                    }}>
+                                        {arc.data.icon}
+                                    </div>
+                                </foreignObject>
                             </g>
                         ))}
-                        
-                        {/* Center text showing total */}
-                        <text
-                            textAnchor="middle"
-                            dy="-0.5em"
-                            fontSize="18"
-                            fontWeight="bold"
-                            fill="#333"
-                        >
-                            Total
-                        </text>
-                        <text
-                            textAnchor="middle"
-                            dy="1em"
-                            fontSize="24"
-                            fontWeight="bold"
-                            fill="#333"
-                        >
-                            {total.toFixed(1)}
-                        </text>
-                        <text
-                            textAnchor="middle"
-                            dy="2.2em"
-                            fontSize="14"
-                            fill="#666"
-                        >
-                            tCO2e
-                        </text>
                     </g>
                 </svg>
-                
-                {/* Legend */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {data.map((item, index) => (
-                        <div 
-                            key={item.name}
-                            style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: '8px',
-                                fontSize: '14px'
-                            }}
-                        >
-                            <div
-                                style={{
-                                    width: '16px',
-                                    height: '16px',
-                                    backgroundColor: item.color,
-                                    borderRadius: '3px'
-                                }}
-                            />
-                            <span style={{ fontWeight: '500' }}>{item.name}</span>
-                            <span style={{ color: '#666' }}>
-                                {item.value} tCO2e ({((item.value / total) * 100).toFixed(1)}%)
-                            </span>
-                        </div>
-                    ))}
-                </div>
+                    
             </div>
         </div>
     );

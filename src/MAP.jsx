@@ -54,7 +54,7 @@ export default function Map() {
         
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
-            style: 'mapbox://styles/mapbox/standard',
+            style: 'mapbox://styles/mapbox/navigation-day-v1',
             center: [lng, lat],
             zoom: zoom
         });

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { scaleLinear, scaleBand, max } from 'd3';
 import { getTotals } from './aggregate.jsx';
+import { ImLeaf } from "react-icons/im";
 
 export default function BarChart() {
     const totals = getTotals();
@@ -8,7 +9,7 @@ export default function BarChart() {
     
     // Calculate depreciation data from 2025 to 2050
     const depreciationData = useMemo(() => {
-        const startYear = 2025;
+        const startYear = 2021;
         const endYear = 2050;
         const yearsToZero = endYear - startYear; // 25 years
         const annualReduction = currentTotal / yearsToZero;
@@ -28,8 +29,8 @@ export default function BarChart() {
     // D3 calculations for chart dimensions and scales
     const { xScale, yScale, chartWidth, chartHeight, margin } = useMemo(() => {
         const margin = { top: 30, right: 30, bottom: 50, left: 70 };
-        const chartWidth = 900;
-        const chartHeight = 450;
+        const chartWidth = 950;
+        const chartHeight = 550;
         const innerWidth = chartWidth - margin.left - margin.right;
         const innerHeight = chartHeight - margin.top - margin.bottom;
         
@@ -37,7 +38,7 @@ export default function BarChart() {
         const xScale = scaleBand()
             .domain(depreciationData.map(d => d.year))
             .range([0, innerWidth])
-            .padding(0.1);
+            .padding(0.3);
             
         const yScale = scaleLinear()
             .domain([0, max(depreciationData, d => d.value)])
@@ -48,28 +49,12 @@ export default function BarChart() {
     
     return (
         <div className='bar-chart'>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', textAlign: 'center' }}>
-                Net Zero Path (2025-2050)
-            </h3>
-            <p style={{ margin: '0 0 15px 0', fontSize: '12px', color: '#666', textAlign: 'center' }}>
-                Linear depreciation to reach zero emissions by 2050
-            </p>
             
             <svg 
                 width={chartWidth} 
                 height={chartHeight}
                 style={{ display: 'block', margin: '0 auto' }}
             >
-                {/* Chart background
-                <rect 
-                    x={margin.left} 
-                    y={margin.top} 
-                    width={chartWidth - margin.left - margin.right} 
-                    height={chartHeight - margin.top - margin.bottom}
-                    fill="#fafafa"
-                    stroke="#e0e0e0"
-                    strokeWidth="1"
-                /> */}
                 
                 {/* Y-axis grid lines */}
                 {yScale.ticks(5).map(tick => (
@@ -87,24 +72,66 @@ export default function BarChart() {
                 {/* Bars */}
                 {depreciationData.map((d, index) => {
                     const barHeight = (chartHeight - margin.top - margin.bottom) - yScale(d.value);
-                    const barColor = index === 0 ? '#f44336' : // Current year - red
-                                   d.value === 0 ? '#4caf50' : // Zero emissions - green
-                                   '#2196f3'; // Future years - blue
+                    
+                    // Create gradient from dark red to light red based on index
+                    let barColor;
+                    if (index === 0) {
+                        barColor = 'rgb(200, 5, 6)'; // Slightly darker than base for index 0
+                    } else if (index === 1) {
+                        barColor = 'rgb(220, 10, 11)'; // Base red color for index 1
+                    } else {
+                        // Calculate lighter shades for subsequent indices
+                        const lightnessFactor = Math.min(0.8, (index - 1) * 0.08); // Gradually increase lightness
+                        const r = Math.min(255, Math.round(220 + (255 - 220) * lightnessFactor));
+                        const g = Math.min(255, Math.round(10 + (255 - 10) * lightnessFactor));
+                        const b = Math.min(255, Math.round(11 + (255 - 11) * lightnessFactor));
+                        barColor = `rgb(${r}, ${g}, ${b})`;
+                    }
                     
                     return (
-                        <rect
-                            key={d.year}
-                            x={margin.left + xScale(d.year)}
-                            y={margin.top + yScale(d.value)}
-                            width={xScale.bandwidth()}
-                            height={barHeight}
-                            fill={barColor}
-                            stroke="#fff"
-                            strokeWidth="1"
-                            opacity={0.8}
-                        >
-                            <title>{`${d.year}: ${d.value} tCO2e`}</title>
-                        </rect>
+                        <g key={d.year}>
+                            <rect
+                                x={margin.left + xScale(d.year)}
+                                y={margin.top + yScale(d.value)}
+                                width={xScale.bandwidth()}
+                                height={barHeight}
+                                fill={index < 4 ? barColor : '#e9e9e9ff'}
+                                fillOpacity={0.7}
+                                stroke={index < 4 ? barColor : '#b8b8b8ff'}
+                                strokeWidth="1"
+                            >
+                                <title>{`${d.year}: ${d.value} tCO2e`}</title>
+                            </rect>
+                            
+                            {/* Add leaf icon for 2050 (net zero) */}
+                            {d.year === 2050 && (
+                                <foreignObject
+                                    x={margin.left + xScale(d.year) + xScale.bandwidth() / 2 - 15}
+                                    y={margin.top + yScale(d.value) - 40}
+                                    width="30"
+                                    height="30"
+                                    style={{ pointerEvents: 'none', overflow: 'visible' }}
+                                >
+                                    <div style={{ 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center',
+                                        width: '100%',
+                                        height: '100%',
+                                        backgroundColor: 'transparent',
+                                        border: 'none',
+                                        margin: 0,
+                                        padding: 0
+                                    }}>
+                                        <ImLeaf style={{ 
+                                            color: '#4caf50', 
+                                            fontSize: '24px', 
+                                            transform: 'translateY(10px)'
+                                        }} />
+                                    </div>
+                                </foreignObject>
+                            )}
+                        </g>
                     );
                 })}
                 
@@ -161,43 +188,6 @@ export default function BarChart() {
                     Total Emissions (tCO2e)
                 </text>
             </svg>
-            
-            {/* Legend */}
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                gap: '15px', 
-                marginTop: '10px',
-                fontSize: '10px'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <div style={{ 
-                        width: '12px', 
-                        height: '12px', 
-                        backgroundColor: '#f44336',
-                        borderRadius: '2px'
-                    }}></div>
-                    <span>Current (2025)</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <div style={{ 
-                        width: '12px', 
-                        height: '12px', 
-                        backgroundColor: '#2196f3',
-                        borderRadius: '2px'
-                    }}></div>
-                    <span>Reduction Path</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <div style={{ 
-                        width: '12px', 
-                        height: '12px', 
-                        backgroundColor: '#4caf50',
-                        borderRadius: '2px'
-                    }}></div>
-                    <span>Net Zero (2050)</span>
-                </div>
-            </div>
         </div>
     );
 }

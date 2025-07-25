@@ -9,6 +9,25 @@ import BarChart from './BarChart.jsx'
 
 
 
+// TODO: Heatmap
+// * Adding a tooltip on hover
+
+
+// TODO: Donuts
+// * Adding a tooltip on hover
+
+
+// TODO: Bar Chart
+// * Adding a leaf icon on top of 2050
+// * Add a x and y axis
+// * Changing the font size of the x and y axis
+// * Changing the font size of the heading
+// * Adding a tooltip on hover
+
+
+
+
+// TODO: BAN
 
 
 
