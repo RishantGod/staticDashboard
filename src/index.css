@@ -4,6 +4,7 @@
   box-sizing: border-box;
 }
 
+
 html, body {
   width: 100%;
   height: 100vh;
@@ -48,10 +49,35 @@ body{
   height:calc(100% - 1rem);
   background-color: white;
   border-radius: 20px;
+  font-size: 24px;
+  display: flex;
+  padding: 1.2rem 0 1rem 0;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+}
+
+.total-ban-text {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  text-anchor: middle;
+  align-items: start;
+  gap: 1rem;
+  font-size: 28px;
+}
+
+.total-ban-upper {
+  display: flex;
   align-items: center;
+  gap: 1rem;
+}
+
+.total-ban-value-box {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
 }
 
 .donut-chart {
@@ -91,7 +117,6 @@ body{
   border-radius: 20px;
   display: flex;
   flex-direction: column;
-  padding: 20px;
   box-sizing: border-box;
 }
 
@@ -99,23 +124,38 @@ body{
   width: 100%;
   height: calc((100% / 3) - 1rem);
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
   border-radius: 20px;
   background-color: white;
+  margin: 0;
+  padding: 0;
 
 }
 
-
+.ban-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-anchor: middle;
+  align-items: start;
+  gap: 1rem;
+  font-size: 24px;
+}
 
 /* * ---- Typography ---- * */
 
 .total-ban-value {
-  font-size: 4rem;
+  font-size: 3.5rem;
   font-weight: bold;
   color: #333;
+  margin: 0;
   
+}
+
+.total-ban-value-unit {
+  font-size: 1.2rem;
+  color: #333;
 }
 
 .ban-value {
@@ -124,3 +164,7 @@ body{
   color: #333;
 }
 
+.ban-value-unit {
+  font-size: 1.2rem;
+  color: #333;
+}

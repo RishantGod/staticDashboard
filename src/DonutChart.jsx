@@ -55,7 +55,7 @@ export default function DonutChart() {
     
     return (
         <div className="donut-chart">
-            <h3 style={{ margin: '14px 0 10px 30px', fontSize: '20px', textAlign: 'left' }}>
+            <h3 style={{ margin: '14px 0 10px 30px', fontSize: '20px', textAlign: 'center' }}>
                 Carbon Emissions by Category
             </h3>
             <div style={{ 

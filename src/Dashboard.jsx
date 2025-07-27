@@ -6,7 +6,9 @@ import DonutChart from './DonutChart.jsx'
 import Heatmap from './Heatmap.jsx'
 import Map from './Map.jsx'
 import BarChart from './BarChart.jsx'
-
+import thermostat from './assets/thermostat.svg'
+import infrastructure from './assets/infrastructure.svg'
+import fuel from './assets/fuel.svg'
 
 
 // TODO: Heatmap
@@ -31,10 +33,6 @@ import BarChart from './BarChart.jsx'
 
 
 
-
-
-
-
 export default function Dashboard() {
   return (
     <div className='dashboard'>
@@ -45,9 +43,21 @@ export default function Dashboard() {
         </div>
         <div className='bottom-row'>
             <div className='ban-group'>
-                <BAN heading="Electricity" value="1000" />
-                <BAN heading="Fuel" value="2000" />
-                <BAN heading="Heating & Cooling" value="3000" />
+                <BAN 
+                    heading="Electricity" 
+                    value="1000" 
+                    icon={infrastructure} 
+                />
+                <BAN 
+                    heading="Fuel" 
+                    value="2000" 
+                    icon={fuel} 
+                />
+                <BAN 
+                    heading="Heating & Cooling" 
+                    value="3000" 
+                    icon={thermostat} 
+                />
             </div>
              <Map />
              <BarChart />

@@ -41,7 +41,7 @@ export default function Heatmap() {
     
     return (
         <div className="heatmap">
-            <h3 style={{ margin: '14px 0 10px 30px', fontSize: '20px', textAlign: 'left', fontWeight: '600', color: '#333' }}>
+            <h3 style={{ margin: '14px 0 10px 30px', fontSize: '20px', textAlign: 'center', fontWeight: '600', color: '#333' }}>
                 Emissions Intensity Heatmap
             </h3>
             

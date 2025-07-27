@@ -9,8 +9,8 @@ const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoicmdvZGFyIi
 export default function Map() {
     const mapContainer = useRef(null);
     const map = useRef(null);
-    const [lng] = useState(103.9320);
-    const [lat] = useState(1.3585);
+    const [lng] = useState(103.93205);
+    const [lat] = useState(1.35858);
     const [zoom] = useState(17);
 
     // Show setup message if no valid token is provided
@@ -54,9 +54,10 @@ export default function Map() {
         
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
-            style: 'mapbox://styles/mapbox/navigation-day-v1',
+            style: 'mapbox://styles/rgodar/cmdkbzv71004m01s94qyegi0x',
             center: [lng, lat],
-            zoom: zoom
+            zoom: zoom,
+            bearing: 27
         });
 
         map.current.on('load', () => {
@@ -74,13 +75,16 @@ export default function Map() {
                 paint: {
                     'fill-color': [
                         'case',
-                        ['==', ['get', 'Name'], 'Block A'], '#4CAF50', // Green for Block A
-                        ['==', ['get', 'Name'], 'Block B'], '#FF9800', // Orange for Block B
-                        ['==', ['get', 'Name'], 'Block C'], '#9C27B0', // Purple for Block C
-                        ['==', ['get', 'Name'], 'Block D'], '#F44336', // Red for Block D
-                        '#2196F3' // Blue for other buildings (Infant School, Tampines House, Sports)
+                        ['==', ['get', 'Name'], 'Block A'], '#48cae4', // Light Blue for Block A
+                        ['==', ['get', 'Name'], 'Block B'], '#ff758f', // Pink for Block B
+                        ['==', ['get', 'Name'], 'Block C'], '#74c69d', // Green for Block C
+                        ['==', ['get', 'Name'], 'Block D'], '#b8b8ff', // Purple for Block D
+                        ['==', ['get', 'Name'], 'Infant School'], '#ffd23f', // Yellow for Infant School
+                        ['==', ['get', 'Name'], 'Tampines House'], '#a4cefc', // Orange for Tampines House
+                        ['==', ['get', 'Name'], 'Sports'], '#e7bc91', // Mint Green for Sports
+                        '#2196F3' // Default blue for any other buildings
                     ],
-                    'fill-opacity': 0.6
+                    'fill-opacity': 0.7
                 }
             });
 
@@ -90,8 +94,19 @@ export default function Map() {
                 type: 'line',
                 source: 'buildings',
                 paint: {
-                    'line-color': '#ffffff',
-                    'line-width': 2
+                    'line-color': [
+                        'case',
+                        ['==', ['get', 'Name'], 'Block A'], '#48cae4', // Light Blue for Block A
+                        ['==', ['get', 'Name'], 'Block B'], '#ff758f', // Pink for Block B
+                        ['==', ['get', 'Name'], 'Block C'], '#74c69d', // Green for Block C
+                        ['==', ['get', 'Name'], 'Block D'], '#b8b8ff', // Purple for Block D
+                        ['==', ['get', 'Name'], 'Infant School'], '#ffd23f', // Yellow for Infant School
+                        ['==', ['get', 'Name'], 'Tampines House'], '#a4cefc', // Orange for Tampines House
+                        ['==', ['get', 'Name'], 'Sports'], '#e7bc91', // Mint Green for Sports
+                        '#2196F3' // Default blue for any other buildings
+                    ],
+                    'line-width': 2,
+                    'line-opacity': 1
                 }
             });
 
@@ -151,14 +166,14 @@ export default function Map() {
     }, [lng, lat, zoom]);
 
     return (
-        <div className="map" style={{ position: 'relative' }}>
+        <div className="map" style={{ position: 'relative', overflow: 'hidden' }}>
             <div ref={mapContainer} style={{ height: '100%', width: '100%' }} />
             
             {/* Map legend */}
             <div style={{
                 position: 'absolute',
                 top: 10,
-                left: 10,
+                right: 20,
                 background: 'rgba(255, 255, 255, 0.95)',
                 padding: '12px',
                 borderRadius: '8px',
@@ -166,70 +181,84 @@ export default function Map() {
                 boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                 backdropFilter: 'blur(4px)'
             }}>
-                <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#333' }}>Campus Buildings</h4>
+                <h4 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#333' }}>Campus Buildings</h4>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
                     <div style={{ 
-                        width: '12px', 
-                        height: '12px', 
-                        backgroundColor: '#4CAF50', 
+                        width: '15px', 
+                        height: '15px', 
+                        backgroundColor: 'rgba(72, 202, 228, 0.3)', 
                         marginRight: '6px',
-                        border: '1px solid #fff',
+                        border: '2px solid #48cae4',
                         borderRadius: '2px'
                     }}></div>
-                    <span style={{ color: '#333', fontSize: '11px' }}>Block A</span>
+                    <span style={{ color: '#333', fontSize: '14px' }}>Block A</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
                     <div style={{ 
-                        width: '12px', 
-                        height: '12px', 
-                        backgroundColor: '#FF9800', 
+                        width: '15px', 
+                        height: '15px', 
+                        backgroundColor: 'rgba(255, 117, 143, 0.3)', 
                         marginRight: '6px',
-                        border: '1px solid #fff',
+                        border: '2px solid #ff758f',
                         borderRadius: '2px'
                     }}></div>
-                    <span style={{ color: '#333', fontSize: '11px' }}>Block B</span>
+                    <span style={{ color: '#333', fontSize: '14px' }}>Block B</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
                     <div style={{ 
-                        width: '12px', 
-                        height: '12px', 
-                        backgroundColor: '#9C27B0', 
+                        width: '15px', 
+                        height: '15px', 
+                        backgroundColor: 'rgba(116, 198, 157, 0.3)', 
                         marginRight: '6px',
-                        border: '1px solid #fff',
+                        border: '2px solid #74c69d',
                         borderRadius: '2px'
                     }}></div>
-                    <span style={{ color: '#333', fontSize: '11px' }}>Block C</span>
+                    <span style={{ color: '#333', fontSize: '14px' }}>Block C</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
                     <div style={{ 
-                        width: '12px', 
-                        height: '12px', 
-                        backgroundColor: '#F44336', 
+                        width: '15px', 
+                        height: '15px', 
+                        backgroundColor: 'rgba(184, 184, 255, 0.3)', 
                         marginRight: '6px',
-                        border: '1px solid #fff',
+                        border: '2px solid #b8b8ff',
                         borderRadius: '2px'
                     }}></div>
-                    <span style={{ color: '#333', fontSize: '11px' }}>Block D</span>
+                    <span style={{ color: '#333', fontSize: '14px' }}>Block D</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
                     <div style={{ 
-                        width: '12px', 
-                        height: '12px', 
-                        backgroundColor: '#2196F3', 
+                        width: '15px', 
+                        height: '15px', 
+                        backgroundColor: 'rgba(255, 210, 63, 0.3)', 
                         marginRight: '6px',
-                        border: '1px solid #fff',
+                        border: '2px solid #ffd23f',
                         borderRadius: '2px'
                     }}></div>
-                    <span style={{ color: '#333', fontSize: '11px' }}>Other Buildings</span>
+                    <span style={{ color: '#333', fontSize: '14px' }}>Infant School</span>
                 </div>
-                <p style={{ 
-                    margin: '6px 0 0 0', 
-                    fontSize: '9px', 
-                    color: '#666',
-                    fontStyle: 'italic'
-                }}>
-                    Click buildings for details
-                </p>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+                    <div style={{ 
+                        width: '15px', 
+                        height: '15px', 
+                        backgroundColor: 'rgba(164, 206, 252, 0.3)', 
+                        marginRight: '6px',
+                        border: '2px solid #a4cefc',
+                        borderRadius: '2px'
+                    }}></div>
+                    <span style={{ color: '#333', fontSize: '14px' }}>Tampines House</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+                    <div style={{ 
+                        width: '15px', 
+                        height: '15px', 
+                        backgroundColor: 'rgba(231, 188, 145, 0.3)', 
+                        marginRight: '6px',
+                        border: '2px solid #e7bc91',
+                        borderRadius: '2px'
+                    }}></div>
+                    <span style={{ color: '#333', fontSize: '14px' }}>Sports</span>
+                </div>
             </div>
         </div>
     );

@@ -27,12 +27,18 @@ export default function BarChart() {
     }, [currentTotal]);
     
     // D3 calculations for chart dimensions and scales
-    const { xScale, yScale, chartWidth, chartHeight, margin } = useMemo(() => {
+    const { xScale, yScale, chartWidth, chartHeight, margin, annualReduction } = useMemo(() => {
         const margin = { top: 30, right: 30, bottom: 50, left: 70 };
         const chartWidth = 950;
-        const chartHeight = 550;
+        const chartHeight = 520;
         const innerWidth = chartWidth - margin.left - margin.right;
         const innerHeight = chartHeight - margin.top - margin.bottom;
+        
+        // Calculate annual reduction
+        const startYear = 2021;
+        const endYear = 2050;
+        const yearsToZero = endYear - startYear;
+        const annualReduction = currentTotal / yearsToZero;
         
         // Create scales
         const xScale = scaleBand()
@@ -44,18 +50,27 @@ export default function BarChart() {
             .domain([0, max(depreciationData, d => d.value)])
             .range([innerHeight, 0]);
             
-        return { xScale, yScale, chartWidth, chartHeight, margin };
-    }, [depreciationData]);
+        return { xScale, yScale, chartWidth, chartHeight, margin, annualReduction };
+    }, [depreciationData, currentTotal]);
     
     return (
         <div className='bar-chart'>
+            {/* Chart heading */}
+            <h3 style={{
+                textAlign: 'center',
+                fontSize: '20px',
+                fontWeight: '600',
+                color: '#333',
+                margin: '14px 0 10px 30px'
+            }}>
+                Pathway to Net Zero
+            </h3>
             
             <svg 
                 width={chartWidth} 
                 height={chartHeight}
                 style={{ display: 'block', margin: '0 auto' }}
             >
-                
                 {/* Y-axis grid lines */}
                 {yScale.ticks(5).map(tick => (
                     <line
@@ -65,6 +80,44 @@ export default function BarChart() {
                         y1={margin.top + yScale(tick)}
                         y2={margin.top + yScale(tick)}
                         stroke="#e0e0e0"
+                        strokeWidth="0.5"
+                    />
+                ))}
+                
+                
+                
+                {/* Y-axis line */}
+                <line
+                    x1={margin.left}
+                    x2={margin.left}
+                    y1={margin.top}
+                    y2={chartHeight - margin.bottom}
+                    stroke="#333"
+                    strokeWidth="1"
+                />
+                
+                {/* X-axis ticks */}
+                {depreciationData.filter((d, index) => index % 5 === 0 || d.year === 2050).map(d => (
+                    <line
+                        key={`x-tick-${d.year}`}
+                        x1={margin.left + xScale(d.year) + xScale.bandwidth() / 2}
+                        x2={margin.left + xScale(d.year) + xScale.bandwidth() / 2}
+                        y1={chartHeight - margin.bottom}
+                        y2={chartHeight - margin.bottom + 5}
+                        stroke="#333"
+                        strokeWidth="1"
+                    />
+                ))}
+                
+                {/* Y-axis ticks */}
+                {yScale.ticks(5).map(tick => (
+                    <line
+                        key={`y-tick-${tick}`}
+                        x1={margin.left - 5}
+                        x2={margin.left}
+                        y1={margin.top + yScale(tick)}
+                        y2={margin.top + yScale(tick)}
+                        stroke="#333"
                         strokeWidth="1"
                     />
                 ))}
@@ -75,18 +128,27 @@ export default function BarChart() {
                     
                     // Create gradient from dark red to light red based on index
                     let barColor;
-                    if (index === 0) {
-                        barColor = 'rgb(200, 5, 6)'; // Slightly darker than base for index 0
-                    } else if (index === 1) {
-                        barColor = 'rgb(220, 10, 11)'; // Base red color for index 1
-                    } else {
-                        // Calculate lighter shades for subsequent indices
-                        const lightnessFactor = Math.min(0.8, (index - 1) * 0.08); // Gradually increase lightness
-                        const r = Math.min(255, Math.round(220 + (255 - 220) * lightnessFactor));
-                        const g = Math.min(255, Math.round(10 + (255 - 10) * lightnessFactor));
-                        const b = Math.min(255, Math.round(11 + (255 - 11) * lightnessFactor));
-                        barColor = `rgb(${r}, ${g}, ${b})`;
-                    }
+                    let barFill;
+                    let barStroke;
+                    let fillOpacity;
+
+                    if (index <= 3) {
+                        barColor = '#4CAF50'; 
+                        barStroke = '#4CAF50'; 
+                        barFill = barColor;
+                        fillOpacity = 0.3;
+                    } else if (index === 4) {
+                        barColor = '#4CAF50'; // Base red color for index 1
+                        barFill = barColor;
+                        barStroke = '#4CAF50';
+                        fillOpacity = 0.6;
+                    } else if (index > 4) {
+                        // Regular bar for index 4 
+                        barColor = '#e9e9e9ff';
+                        barFill = barColor;
+                        barStroke = '#b1b1b1ff';
+                        fillOpacity = 1;
+                    } 
                     
                     return (
                         <g key={d.year}>
@@ -95,10 +157,10 @@ export default function BarChart() {
                                 y={margin.top + yScale(d.value)}
                                 width={xScale.bandwidth()}
                                 height={barHeight}
-                                fill={index < 4 ? barColor : '#e9e9e9ff'}
-                                fillOpacity={0.7}
-                                stroke={index < 4 ? barColor : '#b8b8b8ff'}
-                                strokeWidth="1"
+                                fill={barFill}
+                                fillOpacity={fillOpacity}
+                                stroke={barStroke}
+                                strokeWidth="1.5"
                             >
                                 <title>{`${d.year}: ${d.value} tCO2e`}</title>
                             </rect>
@@ -124,7 +186,7 @@ export default function BarChart() {
                                         padding: 0
                                     }}>
                                         <ImLeaf style={{ 
-                                            color: '#4caf50', 
+                                            color: '#4CAF50', 
                                             fontSize: '24px', 
                                             transform: 'translateY(10px)'
                                         }} />
@@ -134,16 +196,27 @@ export default function BarChart() {
                         </g>
                     );
                 })}
+
+                {/* X-axis line */}
+                <line
+                    x1={margin.left}
+                    x2={chartWidth - margin.right}
+                    y1={chartHeight - margin.bottom}
+                    y2={chartHeight - margin.bottom}
+                    stroke="#333"
+                    strokeWidth="1"
+                />
                 
                 {/* X-axis labels - show every 5 years */}
                 {depreciationData.filter((d, index) => index % 5 === 0 || d.year === 2050).map(d => (
                     <text
                         key={d.year}
                         x={margin.left + xScale(d.year) + xScale.bandwidth() / 2}
-                        y={chartHeight - margin.bottom + 15}
+                        y={chartHeight - margin.bottom + 20}
                         textAnchor="middle"
-                        fontSize="10"
-                        fill="#666"
+                        fontSize="16"
+                        fill="#9a9a9a"
+                        fontWeight="400"
                     >
                         {d.year}
                     </text>
@@ -157,36 +230,84 @@ export default function BarChart() {
                         y={margin.top + yScale(tick)}
                         textAnchor="end"
                         dy="0.35em"
-                        fontSize="10"
-                        fill="#666"
+                        fontSize="14"
+                        fill="#9a9a9a"
                     >
-                        {tick}
+                        {tick.toLocaleString()}
                     </text>
                 ))}
                 
-                {/* Axis titles */}
-                <text
-                    x={chartWidth / 2}
-                    y={chartHeight - 5}
-                    textAnchor="middle"
-                    fontSize="11"
-                    fill="#333"
-                    fontWeight="500"
-                >
-                    Year
-                </text>
                 
                 <text
                     x={15}
-                    y={chartHeight / 2}
+                    y={chartHeight / 2 - 3}
                     textAnchor="middle"
-                    fontSize="11"
+                    fontSize="16"
                     fill="#333"
                     fontWeight="500"
                     transform={`rotate(-90, 15, ${chartHeight / 2})`}
                 >
                     Total Emissions (tCO2e)
                 </text>
+                
+                {/* Annual Reduction Banner */}
+                <g>
+                    {/* Banner background */}
+                    <rect
+                        x={chartWidth - margin.right - 300}
+                        y={margin.top + 50}
+                        width="250"
+                        height="150"
+                        fill="#f8f9fa"
+                        stroke="#4CAF50"
+                        strokeWidth="2"
+                        rx="8"
+                        ry="8"
+                        fillOpacity="0.95"
+                    />
+                    
+                    {/* Banner title - centered horizontally, 1/4 from top */}
+                    <text
+                        x={chartWidth - margin.right - 175} // Center of banner (300/2 = 150, so 300-125 = 175)
+                        y={margin.top + 50 + 25} // 1/4 down from top (150/4 = 37.5)
+                        textAnchor="middle"
+                        fontSize="20"
+                        fill="#333"
+                        fontWeight="600"
+                        dominantBaseline="middle"
+                    >
+                        Annual Reduction
+                    </text>
+                    
+                    {/* Banner value - centered horizontally, 1/2 from top */}
+                    <text
+                        x={chartWidth - margin.right - 175} // Center of banner
+                        y={margin.top + 50 + 75} // 1/2 down from top (150/2 = 75)
+                        textAnchor="middle"
+                        fontSize="40"
+                        fill="#4CAF50"
+                        fontWeight="700"
+                        dominantBaseline="middle"
+                    >
+                        {Math.round((annualReduction * 10) / 10)} 
+                        <tspan fontSize="24"> tCO</tspan>
+                        <tspan fontSize="16" dy="8">2</tspan>
+                        <tspan fontSize="24" dy="-5">e</tspan>
+                    </text>
+                    
+                    {/* Banner subtitle - centered horizontally, 3/4 from top */}
+                    <text
+                        x={chartWidth - margin.right - 175} // Center of banner
+                        y={margin.top + 50 + 112.5} // 3/4 down from top (150 * 3/4 = 112.5)
+                        textAnchor="middle"
+                        fontSize="16"
+                        fill="#666"
+                        fontWeight="500"
+                        dominantBaseline="middle"
+                    >
+                        per year to reach net zero
+                    </text>
+                </g>
             </svg>
         </div>
     );
