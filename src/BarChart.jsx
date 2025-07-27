@@ -1,11 +1,41 @@
 import React, { useMemo } from 'react';
 import { scaleLinear, scaleBand, max } from 'd3';
-import { getTotals } from './aggregate.jsx';
+import { getTotals, getBuildingDonutChartData } from './aggregate.jsx';
 import { ImLeaf } from "react-icons/im";
 
-export default function BarChart() {
+export default function BarChart({ selectedCategory, selectedBuilding }) {
     const totals = getTotals();
-    const currentTotal = totals.total;
+    
+    // Calculate current total based on selection
+    const currentTotal = useMemo(() => {
+        if (selectedBuilding) {
+            // Get building-specific data and sum all categories
+            const buildingData = getBuildingDonutChartData(selectedBuilding);
+            return buildingData.reduce((sum, category) => sum + category.value, 0);
+        } else if (selectedCategory && selectedCategory !== 'all') {
+            // Get category-specific total across all buildings
+            return totals[selectedCategory] || 0;
+        } else {
+            // Get total across all buildings and categories
+            return totals.total;
+        }
+    }, [selectedCategory, selectedBuilding, totals]);
+    
+    // Get title based on selection
+    const getChartTitle = () => {
+        if (selectedBuilding) {
+            return `${selectedBuilding} - Pathway to Net Zero`;
+        } else if (selectedCategory && selectedCategory !== 'all') {
+            const categoryNames = {
+                electricity: 'Electricity',
+                fuel: 'Fuel',
+                heating_cooling: 'Heating & Cooling'
+            };
+            return `${categoryNames[selectedCategory]} - Pathway to Net Zero`;
+        } else {
+            return 'Pathway to Net Zero';
+        }
+    };
     
     // Calculate depreciation data from 2025 to 2050
     const depreciationData = useMemo(() => {
@@ -63,7 +93,7 @@ export default function BarChart() {
                 color: '#333',
                 margin: '14px 0 10px 30px'
             }}>
-                Pathway to Net Zero
+                {getChartTitle()}
             </h3>
             
             <svg 

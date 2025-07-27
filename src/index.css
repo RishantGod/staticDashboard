@@ -1,7 +1,13 @@
+/* Font Variables - Change the --primary-font value to test different fonts */
+:root {  
+  --primary-font: 'Lato', sans-serif;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: var(--primary-font);
 }
 
 
@@ -11,9 +17,7 @@ html, body {
   background-color: #F1F3F5;
 }
 
-body{
-  padding: 2rem 0 0 0;
-}
+
 
 #root {
   width: 100%;
@@ -25,6 +29,23 @@ body{
   height: 95%;
   margin: 0 auto;
   background-color: #F1F3F5;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.title h1 {
+  font-size: 2rem;
+  color: #333;
+  margin-left: 1rem;
+  text-align: center;
+}
+
+.title img {
+  height: 10rem;
+  margin:0;
+
 }
 
 .top-row {
@@ -167,4 +188,10 @@ body{
 .ban-value-unit {
   font-size: 1.2rem;
   color: #333;
+}
+
+/* Selection states for interactive components */
+.ban-selected {
+  border: 3px solid #007acc;
+  box-shadow: 0 0 10px rgba(0, 122, 204, 0.2);
 }

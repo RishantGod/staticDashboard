@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
 import { pie, arc, scaleOrdinal } from 'd3';
-import { getDonutChartData } from './aggregate.jsx';
+import { getDonutChartData, getBuildingDonutChartData } from './aggregate.jsx';
 
-export default function DonutChart() {
-    const data = getDonutChartData();
+export default function DonutChart({ selectedBuilding }) {
+    // Get data based on whether a building is selected
+    const data = selectedBuilding ? getBuildingDonutChartData(selectedBuilding) : getDonutChartData();
     
     // Chart dimensions
     const width = 350;
@@ -54,9 +55,9 @@ export default function DonutChart() {
     }, [data, radius, innerRadius]);
     
     return (
-        <div className="donut-chart">
+        <div className="donut-chart" style={{ position: 'relative' }}>
             <h3 style={{ margin: '14px 0 10px 30px', fontSize: '20px', textAlign: 'center' }}>
-                Carbon Emissions by Category
+                {selectedBuilding ? `${selectedBuilding} - Emissions by Category` : 'Carbon Emissions by Category'}
             </h3>
             <div style={{ 
                 display: 'flex', 
@@ -64,7 +65,7 @@ export default function DonutChart() {
                 alignItems: 'center', 
                 justifyContent: 'center', 
                 gap: '1px',
-                height: '100%',
+                height: 'calc(100% - 60px)',
                 overflow: 'visible'
             }}>
                 {/* SVG Chart */}
@@ -126,6 +127,41 @@ export default function DonutChart() {
                         ))}
                     </g>
                 </svg>
+                
+                {/* Legend positioned in bottom right */}
+                <div style={{
+                    position: 'absolute',
+                    bottom: '15px',
+                    right: '15px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    padding: '10px',
+                    borderRadius: '8px',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                }}>
+                    {data.map((item, index) => (
+                        <div key={item.name} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            fontSize: '12px',
+                            fontWeight: '500'
+                        }}>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}>
+                                {item.icon}
+                            </div>
+                            <span style={{ color: '#333' }}>
+                                {item.name}
+                            </span>
+                        </div>
+                    ))}
+                </div>
                     
             </div>
         </div>

@@ -1,13 +1,8 @@
 import React, { useMemo } from 'react';
 import { scaleLinear, max, min } from 'd3';
 import { interpolateBlues } from 'd3-scale-chromatic';
-import { getHeatmapData } from './aggregate.jsx';
 
-
-
-export default function Heatmap() {
-    const data = getHeatmapData();
-    
+export default function Heatmap({ data, title = "Emissions Intensity Heatmap" }) {
     // Make dimensions responsive to actual CSS container
     const cellWidth = 40; // Wider cells for rectangular shape
     const cellHeight = 22; // Keep height same as before
@@ -42,7 +37,7 @@ export default function Heatmap() {
     return (
         <div className="heatmap">
             <h3 style={{ margin: '14px 0 10px 30px', fontSize: '20px', textAlign: 'center', fontWeight: '600', color: '#333' }}>
-                Emissions Intensity Heatmap
+                {title}
             </h3>
             
             <svg 
@@ -93,7 +88,7 @@ export default function Heatmap() {
                     
                     return (
                         <rect
-                            key={`${cell.month}-${cell.weekday}`}
+                            key={`${cell.monthIndex}-${cell.weekdayIndex}`}
                             x={x}
                             y={y}
                             width={cellWidth - 2}
@@ -104,7 +99,7 @@ export default function Heatmap() {
                             rx="3"
                             style={{
                                 cursor: 'pointer',
-                                transition: 'opacity 0.2s ease'
+                                transition: 'fill 0.6s ease-in-out, opacity 0.2s ease'
                             }}
                             onMouseEnter={(e) => {
                                 e.target.style.opacity = '0.8';

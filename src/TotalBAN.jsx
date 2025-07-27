@@ -3,12 +3,16 @@ import LineChart from './LineChart.jsx';
 import { getTotals } from './aggregate.jsx';
 import totalCarbonIcon from './assets/carbon.svg'
 
-export default function TotalBAN(){
+export default function TotalBAN({ onClick, isSelected }){
     const totals = getTotals();
     
     return(
-        <div className="total-ban">
-            <h4> Total Emissions </h4>
+        <div 
+            className={`total-ban ${isSelected ? 'ban-selected' : ''}`}
+            onClick={onClick}
+            style={{ cursor: 'pointer' }}
+        >
+            <p> Total Emissions </p>
             <div className="total-ban-upper">
                 <img 
                     src={totalCarbonIcon} 

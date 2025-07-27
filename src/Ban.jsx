@@ -1,8 +1,18 @@
 import LineChart from './LineChart.jsx';
 
-export default function BAN({ heading, value, showTrend = false, icon }) {
+export default function BAN({ heading, value, showTrend = false, icon, onClick, isSelected = false }) {
   return (
-    <div className="ban">
+    <div 
+      className={`ban ${isSelected ? 'ban-selected' : ''}`}
+      onClick={onClick}
+      style={{ 
+        cursor: onClick ? 'pointer' : 'default',
+        transition: 'all 0.3s ease',
+        transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+        boxShadow: isSelected ? '0 4px 12px rgba(0, 0, 0, 0.2)' : '0 2px 4px rgba(0, 0, 0, 0.1)',
+        border: isSelected ? '2px solid #007acc' : '2px solid transparent'
+      }}
+    >
         {/* Icon positioned on the left */}
         {icon && (
             <img 

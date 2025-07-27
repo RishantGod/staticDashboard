@@ -6,7 +6,7 @@ import shapesData from './UWC.json';
 // You'll need to get a Mapbox access token from https://account.mapbox.com/access-tokens/
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoicmdvZGFyIiwiYSI6ImNtZGlxN3pkMTBmNHIybXNmaTRua2I5OTYifQ.KZiyF7KnHVi31iM3zdmK4A'; // Replace with your actual token
 
-export default function Map() {
+export default function Map({ onBuildingSelect, selectedBuilding }) {
     const mapContainer = useRef(null);
     const map = useRef(null);
     const [lng] = useState(103.93205);
@@ -84,7 +84,11 @@ export default function Map() {
                         ['==', ['get', 'Name'], 'Sports'], '#e7bc91', // Mint Green for Sports
                         '#2196F3' // Default blue for any other buildings
                     ],
-                    'fill-opacity': 0.7
+                    'fill-opacity': [
+                        'case',
+                        ['==', ['get', 'Name'], selectedBuilding || ''], 1.0, // Full opacity for selected building
+                        0.7 // Normal opacity for other buildings
+                    ]
                 }
             });
 
@@ -128,10 +132,15 @@ export default function Map() {
                 filter: ['!=', ['get', 'Name'], ''] // Only show non-empty names
             });
 
-            // Add click event for building info
+            // Add click event for building info and selection
             map.current.on('click', 'buildings-fill', (e) => {
                 const properties = e.features[0].properties;
                 const name = properties.Name || `Building ${properties.id}`;
+                
+                // Call the building selection handler if provided
+                if (onBuildingSelect && name) {
+                    onBuildingSelect(name);
+                }
                 
                 new mapboxgl.Popup()
                     .setLngLat(e.lngLat)
@@ -140,6 +149,9 @@ export default function Map() {
                             <h4 style="margin: 0 0 4px 0;">${name}</h4>
                             <p style="margin: 0; font-size: 12px; color: #666;">
                                 Building ID: ${properties.id}
+                            </p>
+                            <p style="margin: 4px 0 0 0; font-size: 11px; color: #999;">
+                                Click to view emissions heatmap
                             </p>
                         </div>
                     `)
@@ -165,6 +177,17 @@ export default function Map() {
         };
     }, [lng, lat, zoom]);
 
+    // Update building selection styling when selectedBuilding changes
+    useEffect(() => {
+        if (map.current && map.current.getLayer('buildings-fill')) {
+            map.current.setPaintProperty('buildings-fill', 'fill-opacity', [
+                'case',
+                ['==', ['get', 'Name'], selectedBuilding || ''], 1.0, // Full opacity for selected building
+                0.7 // Normal opacity for other buildings
+            ]);
+        }
+    }, [selectedBuilding]);
+
     return (
         <div className="map" style={{ position: 'relative', overflow: 'hidden' }}>
             <div ref={mapContainer} style={{ height: '100%', width: '100%' }} />
@@ -181,84 +204,51 @@ export default function Map() {
                 boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                 backdropFilter: 'blur(4px)'
             }}>
-                <h4 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#333' }}>Campus Buildings</h4>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-                    <div style={{ 
-                        width: '15px', 
-                        height: '15px', 
-                        backgroundColor: 'rgba(72, 202, 228, 0.3)', 
-                        marginRight: '6px',
-                        border: '2px solid #48cae4',
-                        borderRadius: '2px'
-                    }}></div>
-                    <span style={{ color: '#333', fontSize: '14px' }}>Block A</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-                    <div style={{ 
-                        width: '15px', 
-                        height: '15px', 
-                        backgroundColor: 'rgba(255, 117, 143, 0.3)', 
-                        marginRight: '6px',
-                        border: '2px solid #ff758f',
-                        borderRadius: '2px'
-                    }}></div>
-                    <span style={{ color: '#333', fontSize: '14px' }}>Block B</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-                    <div style={{ 
-                        width: '15px', 
-                        height: '15px', 
-                        backgroundColor: 'rgba(116, 198, 157, 0.3)', 
-                        marginRight: '6px',
-                        border: '2px solid #74c69d',
-                        borderRadius: '2px'
-                    }}></div>
-                    <span style={{ color: '#333', fontSize: '14px' }}>Block C</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-                    <div style={{ 
-                        width: '15px', 
-                        height: '15px', 
-                        backgroundColor: 'rgba(184, 184, 255, 0.3)', 
-                        marginRight: '6px',
-                        border: '2px solid #b8b8ff',
-                        borderRadius: '2px'
-                    }}></div>
-                    <span style={{ color: '#333', fontSize: '14px' }}>Block D</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-                    <div style={{ 
-                        width: '15px', 
-                        height: '15px', 
-                        backgroundColor: 'rgba(255, 210, 63, 0.3)', 
-                        marginRight: '6px',
-                        border: '2px solid #ffd23f',
-                        borderRadius: '2px'
-                    }}></div>
-                    <span style={{ color: '#333', fontSize: '14px' }}>Infant School</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-                    <div style={{ 
-                        width: '15px', 
-                        height: '15px', 
-                        backgroundColor: 'rgba(164, 206, 252, 0.3)', 
-                        marginRight: '6px',
-                        border: '2px solid #a4cefc',
-                        borderRadius: '2px'
-                    }}></div>
-                    <span style={{ color: '#333', fontSize: '14px' }}>Tampines House</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-                    <div style={{ 
-                        width: '15px', 
-                        height: '15px', 
-                        backgroundColor: 'rgba(231, 188, 145, 0.3)', 
-                        marginRight: '6px',
-                        border: '2px solid #e7bc91',
-                        borderRadius: '2px'
-                    }}></div>
-                    <span style={{ color: '#333', fontSize: '14px' }}>Sports</span>
-                </div>
+                <h4 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#333' }}>
+                    Campus Buildings
+                    {selectedBuilding && (
+                        <div style={{ fontSize: '10px', color: '#666', marginTop: '2px', fontWeight: 'normal' }}>
+                            Selected: {selectedBuilding}
+                        </div>
+                    )}
+                </h4>
+                {[
+                    { name: 'Block A', color: '#48cae4' },
+                    { name: 'Block B', color: '#ff758f' },
+                    { name: 'Block C', color: '#74c69d' },
+                    { name: 'Block D', color: '#b8b8ff' },
+                    { name: 'Infant School', color: '#ffd23f' },
+                    { name: 'Tampines House', color: '#a4cefc' },
+                    { name: 'Sports', color: '#e7bc91' }
+                ].map((building) => (
+                    <div key={building.name} style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        marginBottom: '4px',
+                        padding: '2px',
+                        borderRadius: '3px',
+                        backgroundColor: selectedBuilding === building.name ? 'rgba(0,0,0,0.1)' : 'transparent'
+                    }}>
+                        <div style={{ 
+                            width: '15px', 
+                            height: '15px', 
+                            backgroundColor: `rgba(${parseInt(building.color.slice(1,3), 16)}, ${parseInt(building.color.slice(3,5), 16)}, ${parseInt(building.color.slice(5,7), 16)}, 0.7)`, 
+                            marginRight: '6px',
+                            border: `2px solid ${building.color}`,
+                            borderRadius: '2px'
+                        }}></div>
+                        <span style={{ 
+                            color: '#333', 
+                            fontSize: '14px',
+                            fontWeight: selectedBuilding === building.name ? 'bold' : 'normal'
+                        }}>
+                            {building.name}
+                        </span>
+                        {selectedBuilding === building.name && (
+                            <span style={{ marginLeft: '4px', color: '#666', fontSize: '10px' }}>●</span>
+                        )}
+                    </div>
+                ))}
             </div>
         </div>
     );
