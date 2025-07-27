@@ -1,10 +1,40 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { scaleLinear, scaleBand, max } from 'd3';
 import { getTotals, getBuildingDonutChartData } from './aggregate.jsx';
 import { ImLeaf } from "react-icons/im";
 
 export default function BarChart({ selectedCategory, selectedBuilding }) {
     const totals = getTotals();
+    const containerRef = useRef(null);
+    const [dimensions, setDimensions] = useState({ width: 800, height: 400 });
+    
+    // Update dimensions when container size changes
+    useEffect(() => {
+        const updateDimensions = () => {
+            if (containerRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                // Leave space for padding and title
+                const availableWidth = rect.width - 32; // 16px padding on each side
+                const availableHeight = rect.height - 80; // Space for title and padding
+                
+                setDimensions({
+                    width: Math.max(300, availableWidth), // Minimum width
+                    height: Math.max(200, availableHeight) // Minimum height
+                });
+            }
+        };
+        
+        updateDimensions();
+        
+        const resizeObserver = new ResizeObserver(updateDimensions);
+        if (containerRef.current) {
+            resizeObserver.observe(containerRef.current);
+        }
+        
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
     
     // Calculate current total based on selection
     const currentTotal = useMemo(() => {
@@ -58,9 +88,17 @@ export default function BarChart({ selectedCategory, selectedBuilding }) {
     
     // D3 calculations for chart dimensions and scales
     const { xScale, yScale, chartWidth, chartHeight, margin, annualReduction } = useMemo(() => {
-        const margin = { top: 30, right: 30, bottom: 50, left: 70 };
-        const chartWidth = 950;
-        const chartHeight = 520;
+        // Dynamic margins based on chart size
+        const baseMargin = { top: 30, right: 30, bottom: 50, left: 70 };
+        const margin = {
+            top: Math.max(20, Math.min(baseMargin.top, dimensions.height * 0.08)),
+            right: Math.max(20, Math.min(baseMargin.right, dimensions.width * 0.05)),
+            bottom: Math.max(40, Math.min(baseMargin.bottom, dimensions.height * 0.15)),
+            left: Math.max(50, Math.min(baseMargin.left, dimensions.width * 0.1))
+        };
+        
+        const chartWidth = dimensions.width;
+        const chartHeight = dimensions.height;
         const innerWidth = chartWidth - margin.left - margin.right;
         const innerHeight = chartHeight - margin.top - margin.bottom;
         
@@ -81,26 +119,34 @@ export default function BarChart({ selectedCategory, selectedBuilding }) {
             .range([innerHeight, 0]);
             
         return { xScale, yScale, chartWidth, chartHeight, margin, annualReduction };
-    }, [depreciationData, currentTotal]);
+    }, [depreciationData, currentTotal, dimensions]);
     
     return (
-        <div className='bar-chart'>
+        <div className='bar-chart' ref={containerRef}>
             {/* Chart heading */}
-            <h3 style={{
-                textAlign: 'center',
-                fontSize: '20px',
-                fontWeight: '600',
-                color: '#333',
-                margin: '14px 0 10px 30px'
-            }}>
-                {getChartTitle()}
-            </h3>
+            <div className="chart-header">
+                <h3 style={{
+                    textAlign: 'center',
+                    fontSize: `${Math.max(14, Math.min(20, chartWidth * 0.025))}px`,
+                    fontWeight: '600',
+                    color: '#333',
+                    margin: '8px 0',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                }}>
+                    {getChartTitle()}
+                </h3>
+            </div>
             
-            <svg 
-                width={chartWidth} 
-                height={chartHeight}
-                style={{ display: 'block', margin: '0 auto' }}
-            >
+            <div className="chart-content">
+                <svg 
+                    width="100%" 
+                    height="100%"
+                    viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+                    preserveAspectRatio="xMidYMid meet"
+                    style={{ display: 'block', maxWidth: '100%', maxHeight: '100%' }}
+                >
                 {/* Y-axis grid lines */}
                 {yScale.ticks(5).map(tick => (
                     <line
@@ -244,7 +290,7 @@ export default function BarChart({ selectedCategory, selectedBuilding }) {
                         x={margin.left + xScale(d.year) + xScale.bandwidth() / 2}
                         y={chartHeight - margin.bottom + 20}
                         textAnchor="middle"
-                        fontSize="16"
+                        fontSize={Math.max(10, Math.min(16, chartWidth * 0.02))}
                         fill="#9a9a9a"
                         fontWeight="400"
                     >
@@ -260,19 +306,19 @@ export default function BarChart({ selectedCategory, selectedBuilding }) {
                         y={margin.top + yScale(tick)}
                         textAnchor="end"
                         dy="0.35em"
-                        fontSize="14"
+                        fontSize={Math.max(10, Math.min(14, chartWidth * 0.018))}
                         fill="#9a9a9a"
                     >
                         {tick.toLocaleString()}
                     </text>
                 ))}
                 
-                
+                {/* Y-axis title */}
                 <text
                     x={15}
                     y={chartHeight / 2 - 3}
                     textAnchor="middle"
-                    fontSize="16"
+                    fontSize={Math.max(12, Math.min(16, chartWidth * 0.02))}
                     fill="#333"
                     fontWeight="500"
                     transform={`rotate(-90, 15, ${chartHeight / 2})`}
@@ -282,63 +328,79 @@ export default function BarChart({ selectedCategory, selectedBuilding }) {
                 
                 {/* Annual Reduction Banner */}
                 <g>
-                    {/* Banner background */}
-                    <rect
-                        x={chartWidth - margin.right - 300}
-                        y={margin.top + 50}
-                        width="250"
-                        height="150"
-                        fill="#f8f9fa"
-                        stroke="#4CAF50"
-                        strokeWidth="2"
-                        rx="8"
-                        ry="8"
-                        fillOpacity="0.95"
-                    />
-                    
-                    {/* Banner title - centered horizontally, 1/4 from top */}
-                    <text
-                        x={chartWidth - margin.right - 175} // Center of banner (300/2 = 150, so 300-125 = 175)
-                        y={margin.top + 50 + 25} // 1/4 down from top (150/4 = 37.5)
-                        textAnchor="middle"
-                        fontSize="20"
-                        fill="#333"
-                        fontWeight="600"
-                        dominantBaseline="middle"
-                    >
-                        Annual Reduction
-                    </text>
-                    
-                    {/* Banner value - centered horizontally, 1/2 from top */}
-                    <text
-                        x={chartWidth - margin.right - 175} // Center of banner
-                        y={margin.top + 50 + 75} // 1/2 down from top (150/2 = 75)
-                        textAnchor="middle"
-                        fontSize="40"
-                        fill="#4CAF50"
-                        fontWeight="700"
-                        dominantBaseline="middle"
-                    >
-                        {Math.round((annualReduction * 10) / 10)} 
-                        <tspan fontSize="24"> tCO</tspan>
-                        <tspan fontSize="16" dy="8">2</tspan>
-                        <tspan fontSize="24" dy="-5">e</tspan>
-                    </text>
-                    
-                    {/* Banner subtitle - centered horizontally, 3/4 from top */}
-                    <text
-                        x={chartWidth - margin.right - 175} // Center of banner
-                        y={margin.top + 50 + 112.5} // 3/4 down from top (150 * 3/4 = 112.5)
-                        textAnchor="middle"
-                        fontSize="16"
-                        fill="#666"
-                        fontWeight="500"
-                        dominantBaseline="middle"
-                    >
-                        per year to reach net zero
-                    </text>
+                    {/* Calculate responsive banner dimensions and position */}
+                    {(() => {
+                        const bannerWidth = Math.max(150, Math.min(250, chartWidth * 0.25));
+                        const bannerHeight = Math.max(100, Math.min(150, chartHeight * 0.25));
+                        const bannerX = chartWidth - margin.right - bannerWidth - 10;
+                        const bannerY = margin.top + 20;
+                        const fontSize = Math.max(12, Math.min(20, bannerWidth * 0.08));
+                        const valueFontSize = Math.max(20, Math.min(40, bannerWidth * 0.16));
+                        const subtitleFontSize = Math.max(10, Math.min(16, bannerWidth * 0.064));
+                        
+                        return (
+                            <>
+                                {/* Banner background */}
+                                <rect
+                                    x={bannerX}
+                                    y={bannerY}
+                                    width={bannerWidth}
+                                    height={bannerHeight}
+                                    fill="#f8f9fa"
+                                    stroke="#4CAF50"
+                                    strokeWidth="2"
+                                    rx="8"
+                                    ry="8"
+                                    fillOpacity="0.95"
+                                />
+                                
+                                {/* Banner title */}
+                                <text
+                                    x={bannerX + bannerWidth / 2}
+                                    y={bannerY + bannerHeight * 0.25}
+                                    textAnchor="middle"
+                                    fontSize={fontSize}
+                                    fill="#333"
+                                    fontWeight="600"
+                                    dominantBaseline="middle"
+                                >
+                                    Annual Reduction
+                                </text>
+                                
+                                {/* Banner value */}
+                                <text
+                                    x={bannerX + bannerWidth / 2}
+                                    y={bannerY + bannerHeight * 0.5}
+                                    textAnchor="middle"
+                                    fontSize={valueFontSize}
+                                    fill="#4CAF50"
+                                    fontWeight="700"
+                                    dominantBaseline="middle"
+                                >
+                                    {Math.round((annualReduction * 10) / 10)} 
+                                    <tspan fontSize={valueFontSize * 0.6}> tCO</tspan>
+                                    <tspan fontSize={valueFontSize * 0.4} dy="4">2</tspan>
+                                    <tspan fontSize={valueFontSize * 0.6} dy="-2">e</tspan>
+                                </text>
+                                
+                                {/* Banner subtitle */}
+                                <text
+                                    x={bannerX + bannerWidth / 2}
+                                    y={bannerY + bannerHeight * 0.75}
+                                    textAnchor="middle"
+                                    fontSize={subtitleFontSize}
+                                    fill="#666"
+                                    fontWeight="500"
+                                    dominantBaseline="middle"
+                                >
+                                    per year to reach net zero
+                                </text>
+                            </>
+                        );
+                    })()}
                 </g>
-            </svg>
+                </svg>
+            </div>
         </div>
     );
 }

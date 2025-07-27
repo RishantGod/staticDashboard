@@ -132,7 +132,7 @@ export default function Map({ onBuildingSelect, selectedBuilding }) {
                 filter: ['!=', ['get', 'Name'], ''] // Only show non-empty names
             });
 
-            // Add click event for building info and selection
+            // Add click event for building selection
             map.current.on('click', 'buildings-fill', (e) => {
                 const properties = e.features[0].properties;
                 const name = properties.Name || `Building ${properties.id}`;
@@ -141,21 +141,6 @@ export default function Map({ onBuildingSelect, selectedBuilding }) {
                 if (onBuildingSelect && name) {
                     onBuildingSelect(name);
                 }
-                
-                new mapboxgl.Popup()
-                    .setLngLat(e.lngLat)
-                    .setHTML(`
-                        <div style="padding: 8px;">
-                            <h4 style="margin: 0 0 4px 0;">${name}</h4>
-                            <p style="margin: 0; font-size: 12px; color: #666;">
-                                Building ID: ${properties.id}
-                            </p>
-                            <p style="margin: 4px 0 0 0; font-size: 11px; color: #999;">
-                                Click to view emissions heatmap
-                            </p>
-                        </div>
-                    `)
-                    .addTo(map.current);
             });
 
             // Change cursor on hover

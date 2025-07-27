@@ -26,48 +26,53 @@ html, body {
 
 .dashboard {
   width: 95%;
-  height: 95%;
+  height: 90%;
   margin: 0 auto;
   background-color: #F1F3F5;
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
   text-align: center;
   margin-bottom: 1rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 .title h1 {
   font-size: 2rem;
   color: #333;
-  margin-left: 1rem;
   text-align: center;
-}
-
-.title img {
-  height: 10rem;
-  margin:0;
-
+  margin: 0;
 }
 
 .top-row {
-  width:100%;
-  height:40%;
+  width: 100%;
+  height: 40%;
   background-color: #F1F3F5;
-  display:flex;
+  display: flex;
   justify-content: space-between;
+  gap: 1rem;
+  flex-shrink: 0;
 }
 
 .bottom-row {
-  width:100%;
-  height:60%;
+  width: 100%;
+  height: 60%;
   background-color: #F1F3F5;
   display: flex;
   justify-content: start;
   gap: 2rem;
+  flex: 1;
+  min-height: 0;
 }
 
 .total-ban {
-  width:calc(20% - 1rem);
-  height:calc(100% - 1rem);
+  width: calc(20% - 1rem);
+  height: calc(100% - 1rem);
   background-color: white;
   border-radius: 20px;
   font-size: 24px;
@@ -76,7 +81,7 @@ html, body {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-
+  min-height: 200px;
 }
 
 .total-ban-text {
@@ -139,6 +144,50 @@ html, body {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+/* Bar chart content styling */
+.bar-chart > * {
+  max-width: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
+}
+
+/* Bar chart SVG responsiveness */
+.bar-chart svg {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
+  max-height: calc(100% - 3rem); /* Account for title/header space */
+  display: block;
+}
+
+/* Bar chart container for D3 elements */
+.bar-chart .chart-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bar chart title/header area */
+.bar-chart .chart-header {
+  flex-shrink: 0;
+  max-height: 3rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Bar chart content area */
+.bar-chart .chart-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
 }
 
 .ban {
@@ -194,4 +243,250 @@ html, body {
 .ban-selected {
   border: 3px solid #007acc;
   box-shadow: 0 0 10px rgba(0, 122, 204, 0.2);
+}
+
+/* Responsive BAN and TotalBAN styling */
+@media (max-width: 1439px) {
+  .total-ban {
+    padding: 1rem 0 0.8rem 0;
+  }
+  
+  .ban {
+    padding: 0.8rem;
+  }
+  
+  .total-ban-value-box {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .total-ban {
+    padding: 0.8rem 0 0.6rem 0;
+  }
+  
+  .ban {
+    padding: 0.6rem;
+  }
+  
+  .total-ban-upper {
+    gap: 0.8rem;
+  }
+  
+  .total-ban-value-box {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.05rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .total-ban {
+    padding: 0.6rem 0 0.4rem 0;
+  }
+  
+  .ban {
+    padding: 0.4rem;
+  }
+  
+  .total-ban-upper {
+    gap: 0.6rem;
+  }
+  
+  .total-ban-value-box {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+  }
+  
+  .ban-text {
+    gap: 0.6rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .total-ban {
+    padding: 0.4rem 0 0.2rem 0;
+  }
+  
+  .ban {
+    padding: 0.2rem;
+  }
+  
+  .total-ban-upper {
+    gap: 0.4rem;
+  }
+  
+  .total-ban-value-box {
+    flex-direction: column;
+    align-items: center;
+    gap: 0rem;
+  }
+  
+  .ban-text {
+    gap: 0.4rem;
+  }
+}
+
+/* Responsive Layout Changes */
+@media (max-width: 1200px) {
+  /* Large tablets - keep original layout but reduce gaps */
+  .bottom-row {
+    gap: 1rem;
+  }
+  
+  .title h1 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  /* Medium tablets - stack donut chart below heatmap */
+  .dashboard {
+    height: auto;
+    min-height: 90vh;
+  }
+  
+  .top-row {
+    height: auto;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .bottom-row {
+    height: auto;
+    flex: none;
+    gap: 1rem;
+  }
+  
+  /* First row: TotalBAN and Heatmap */
+  .heatmap-totalban-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .total-ban {
+    width: calc(30% - 0.5rem);
+    height: 300px;
+  }
+  
+  .heatmap {
+    width: calc(70% - 0.5rem);
+    height: 300px;
+  }
+  
+  /* Second row: DonutChart */
+  .donut-chart {
+    width: 100%;
+    height: 300px;
+    margin-bottom: 1rem;
+  }
+  
+  /* Bottom row adjustments */
+  .ban-group {
+    width: calc(25% - 0.75rem);
+  }
+  
+  .map {
+    width: calc(35% - 0.75rem);
+  }
+  
+  .bar-chart {
+    width: calc(40% - 0.75rem);
+  }
+  
+  .title h1 {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Small tablets - single column for main content */
+  .dashboard {
+    width: 98%;
+    padding: 0 1%;
+  }
+  
+  .top-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .bottom-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .total-ban,
+  .donut-chart,
+  .heatmap,
+  .ban-group,
+  .map,
+  .bar-chart {
+    width: 100%;
+    height: 280px;
+  }
+  
+  .ban-group {
+    height: auto;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .ban {
+    width: calc(33.33% - 0.5rem);
+    height: 120px;
+  }
+  
+  .title h1 {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Mobile phones - vertical stack everything */
+  .dashboard {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .title {
+    height: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .title h1 {
+    font-size: 1.2rem;
+  }
+  
+  .top-row,
+  .bottom-row {
+    gap: 0.5rem;
+  }
+  
+  .total-ban,
+  .donut-chart,
+  .heatmap,
+  .map,
+  .bar-chart {
+    width: 100%;
+    height: 250px;
+    border-radius: 15px;
+  }
+  
+  .ban-group {
+    height: auto;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .ban {
+    width: 100%;
+    height: 100px;
+    border-radius: 15px;
+  }
 }
