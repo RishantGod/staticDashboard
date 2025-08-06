@@ -20,8 +20,8 @@ export default function BAN({ heading, value, showTrend = false, icon, onClick, 
   };
 
   const scale = getResponsiveSize();
-  const iconSize = Math.max(20, 40 * scale); // Min 20%, max 40%
-  const fontSize = Math.max(12, 24 * scale); // Min 12px, scales with screen
+  const iconSize = Math.max(18, 36 * scale); // Reduced from 20, 40
+  const fontSize = Math.max(11, 22 * scale); // Reduced from 12, 24
   return (
     <div 
       className={`ban ${isSelected ? 'ban-selected' : ''}`}

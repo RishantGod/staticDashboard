@@ -26,17 +26,17 @@ export default function DonutChart({ selectedBuilding }) {
     const scale = getResponsiveScale();
     
     // Chart dimensions with responsive scaling
-    const width = Math.max(200, 350 * scale);
-    const height = Math.max(180, 320 * scale);
-    const margin = Math.max(10, 20 * scale);
+    const width = Math.max(180, 315 * scale); 
+    const height = Math.max(160, 290 * scale);
+    const margin = Math.max(8, 15 * scale); // Reduced margin
     const radius = Math.min(width, height) / 2 - margin;
-    const innerRadius = radius * 0.6;
+    const innerRadius = radius * 0.55; // Made the donut thinner
     
     // Responsive font sizes
-    const titleFontSize = Math.max(14, 20 * scale);
-    const percentageFontSize = Math.max(8, 12 * scale);
-    const legendFontSize = Math.max(8, 12 * scale);
-    const iconSize = Math.max(16, 24 * scale);
+    const titleFontSize = Math.max(11, 16 * scale); // Reduced font size
+    const percentageFontSize = Math.max(6, 10 * scale); // Reduced font size
+    const legendFontSize = Math.max(6, 10 * scale); // Reduced font size
+    const iconSize = Math.max(12, 20 * scale); // Reduced icon size
     
     // D3 calculations
     const { arcs, colorScale, total } = useMemo(() => {
@@ -82,9 +82,10 @@ export default function DonutChart({ selectedBuilding }) {
     return (
         <div className="donut-chart" style={{ position: 'relative' }}>
             <h3 style={{ 
-                margin: `${Math.max(8, 14 * scale)}px 0 ${Math.max(5, 10 * scale)}px ${Math.max(15, 30 * scale)}px`, 
+                margin: `${Math.max(5, 10 * scale)}px 0`, // Simplified and reduced margin
                 fontSize: `${titleFontSize}px`, 
-                textAlign: 'center' 
+                textAlign: 'center',
+                height: `${titleFontSize * 1.5}px` // Explicit height to reserve space
             }}>
                 {selectedBuilding ? `${selectedBuilding} - Emissions by Category` : 'Carbon Emissions by Category'}
             </h3>
@@ -94,12 +95,12 @@ export default function DonutChart({ selectedBuilding }) {
                 alignItems: 'center', 
                 justifyContent: 'center', 
                 gap: '1px',
-                height: 'calc(100% - 60px)',
+                height: `calc(100% - ${titleFontSize * 1.5}px)`, // Dynamically calculate height
                 overflow: 'visible'
             }}>
                 {/* SVG Chart */}
-                <svg width={width} height={height} style={{ marginBottom: `${Math.max(5, 10 * scale)}px` }}>
-                    <g transform={`translate(${width/2}, ${height/2 - Math.max(10, 20 * scale)})`}>
+                <svg width={width} height={height} style={{ overflow: 'visible', marginBottom: `${Math.max(5, 10 * scale)}px` }}>
+                    <g transform={`translate(${width/2}, ${height/2})`}> {/* Centered the chart */}
                         {arcs.map((arc, index) => (
                             <g key={arc.data.name}>
                                 {/* Arc path */}
