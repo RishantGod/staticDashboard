@@ -1,3 +1,25 @@
+:root {  
+  --primary-font: 'Lato', sans-serif;
+}
+
+/* A more robust CSS reset for consistency */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Production-specific fixes for consistent sizing and font scaling */
+html {
+  font-size: 16px; /* Establishes a consistent base font size */
+  -webkit-text-size-adjust: 100%; /* Prevents iOS from resizing text */
+  -ms-text-size-adjust: 100%; /* Prevents other mobile browsers from resizing text */
+  -moz-text-size-adjust: 100%;
+}
+
+
 .logo {
   height: 6em;
   padding: 1.5em;
