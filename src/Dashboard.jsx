@@ -22,8 +22,7 @@ import {
 
 
 
-// TODO: Heatmap
-// * Transition effects when data changes 
+// TODO: Heatmap 
 // * Adding a tooltip on hover
 
 

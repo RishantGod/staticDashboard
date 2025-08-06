@@ -23,10 +23,10 @@ export default function TotalBAN({ onClick, isSelected }){
     };
 
     const scale = getResponsiveSize();
-    const iconSize = Math.max(25, 50 * scale); // Min 25%, max 50%
+    const iconSize = Math.max(25, 45 * scale); // Min 25%, max 50%
     const titleFontSize = Math.max(10, 24 * scale); // Title font
-    const valueFontSize = Math.max(14, 56 * scale); // Large value font - reduced more aggressively
-    const unitFontSize = Math.max(6, 19 * scale); // Unit font
+    const valueFontSize = Math.max(14, 45 * scale); // Large value font - reduced more aggressively
+    const unitFontSize = Math.max(6, 16 * scale); // Unit font
     
     // Make chart width much larger on mobile (80% of container width)
     const chartWidth = screenWidth <= 480 ? 
